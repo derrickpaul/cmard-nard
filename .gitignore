@@ -1,0 +1,26 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Eclipse files
+*/.project
+*/.classpath
+*/.settings/**
+
+# Maven build files
+*/target/**
+
+# Vert.x files
+*/.vertx/**
