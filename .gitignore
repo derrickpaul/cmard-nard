@@ -15,12 +15,12 @@
 *.rar
 
 # Eclipse files
-*/.project
-*/.classpath
-*/.settings/**
+.project
+.classpath
+.settings/
 
 # Maven build files
-*/target/**
+target/
 
 # Vert.x files
-*/.vertx/**
+.vertx/
