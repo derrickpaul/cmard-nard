@@ -14,7 +14,7 @@ var ExceptionHandler = {
         }
 
         // Log the exception.
-        logger.error("Exception received. Status code: " + rc.statusCode() + "Request: " + rc.request().method() + " "
+        logger.error("Exception received. Status code: " + rc.statusCode() + ". Request: " + rc.request().method() + " "
                 + rc.request().uri(), rc.failure());
 
         if (rc.failure() != null) {

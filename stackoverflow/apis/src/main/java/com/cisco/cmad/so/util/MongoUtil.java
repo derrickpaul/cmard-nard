@@ -7,6 +7,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
 
 public class MongoUtil {
+
     private static Logger logger = LoggerFactory.getLogger(MongoUtil.class.getName());
 
     private static MongoClient client = null;

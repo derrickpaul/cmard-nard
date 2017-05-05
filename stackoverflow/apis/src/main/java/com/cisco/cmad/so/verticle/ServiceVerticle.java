@@ -11,7 +11,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 public class ServiceVerticle extends AbstractVerticle {
-
     private static Logger logger = LoggerFactory.getLogger(ServiceVerticle.class.getName());
 
     private QuestionsService questionsService = new QuestionsService();

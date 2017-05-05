@@ -10,14 +10,22 @@
 
 var logger = Java.type("io.vertx.core.logging.LoggerFactory").getLogger("js.MainVerticle");
 logger.info("Initializing main verticle, routers and framework handlers");
+
+// Deploy other verticles
+vertx.deployVerticle("com.cisco.cmad.so.verticle.ServiceVerticle");
+vertx.deployVerticle("com.cisco.cmad.so.verticle.UserVerticle");
+
 // Create router instance.
 var Router = require("vertx-web-js/router");
 var router = Router.router(vertx);
 
-// Add handler for static content.
-// TODO : Check if this is required. May be for Swagger UI?
+// Add handler for static content. Used for swagger-ui
 var StaticHandler = require("vertx-web-js/static_handler");
 router.route("/static/*").handler(StaticHandler.create().setWebRoot("web").handle);
+
+// Set a timeout handler to return a timeout HTTP response.
+var TimeoutHandler = require("vertx-web-js/timeout_handler");
+router.route("/apis/*").handler(TimeoutHandler.create(30000).handle);
 
 // Handle exceptions from any of the REST APIs.
 load("classpath:js/handler/ExceptionHandler.js");

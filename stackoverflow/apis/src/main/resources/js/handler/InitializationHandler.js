@@ -10,7 +10,7 @@ var InitializationHandler = {
         if (logger.isTraceEnabled()) {
             logger.trace("Request received: " + rc.request().method() + " " + rc.request().uri());
         }
-
+        
         // Set the response as chunked and content type.
         rc.response().setChunked(true).putHeader("content-type", "application/json");
         rc.next();

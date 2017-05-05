@@ -30,7 +30,22 @@ public class QuestionsService {
     }
 
     public void getQuestionById(Message<Object> message) {
+        logger.debug("Get question by Id");
+        String questionId = message.body().toString();
+        JsonObject query = new JsonObject();
+        query.put("_id", questionId);
 
+        MongoUtil.getMongoClient().findOne("questions", query, null, reply -> {
+            if (reply.succeeded()) {
+                if (reply.result() == null)
+                    message.reply(null);
+                else
+                    message.reply(reply.result().toString());
+            } else {
+                logger.error("Error getting question by ID from database", reply.cause());
+                message.fail(500, "Database error.");
+            }
+        });
     }
 
     public void updateQuestion(Message<Object> message) {

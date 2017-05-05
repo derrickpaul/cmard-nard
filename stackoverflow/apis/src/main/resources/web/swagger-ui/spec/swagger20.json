@@ -1,0 +1,929 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "An application to simulate basic StackOverflow behaviour, mainly for learning modern application development practices.",
+    "version" : "1.0",
+    "title" : "StackOverflow API",
+    "termsOfService" : "",
+    "contact" : { }
+  },
+  "host" : "localhost:8080",
+  "basePath" : "/apis",
+  "schemes" : [ "http" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/users" : {
+      "get" : {
+        "summary" : "Search users",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "email",
+          "in" : "query",
+          "required" : true,
+          "type" : "string",
+          "description" : "email address of the user",
+          "x-example" : "email=johndoe@test.com"
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "required" : false,
+          "type" : "integer",
+          "description" : "The page number to return. This API is paginated. If left empty, defaults to 1",
+          "x-example" : "page=1"
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "required" : false,
+          "type" : "integer",
+          "description" : "The number of result instances to return. If left empty, defaults to 10",
+          "x-example" : "size=10"
+        }, {
+          "name" : "firstName",
+          "in" : "query",
+          "required" : false,
+          "type" : "string",
+          "description" : "First name of user",
+          "x-example" : "firstName=John"
+        }, {
+          "name" : "lastName",
+          "in" : "query",
+          "required" : false,
+          "type" : "string",
+          "description" : "Last name of user",
+          "x-example" : "lastName=Doe"
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "description" : "List of matching questions along with answers and comments.",
+              "items" : {
+                "$ref" : "#/definitions/User"
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create user",
+        "description" : "TODO : Find authorization mechanism.",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/User"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "User created successfully",
+            "headers" : {
+              "Location" : {
+                "type" : "string",
+                "description" : "Id of the user created.",
+                "x-example" : "4455-2212-3345-7765"
+              }
+            }
+          },
+          "401" : {
+            "description" : "If user is not authenticated, due to missing or incorrect Authorization header."
+          },
+          "403" : {
+            "description" : "If user is not authorized to create a new user."
+          },
+          "422" : {
+            "description" : "The POST body did not contain all the required attributes."
+          }
+        }
+      }
+    },
+    "/users/{id}" : {
+      "get" : {
+        "summary" : "Get user by ID",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/User"
+            }
+          },
+          "404" : {
+            "description" : "The entity is not found."
+          }
+        }
+      },
+      "patch" : {
+        "summary" : "Update user",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/User"
+          },
+          "x-examples" : {
+            "application/json" : "{firstName: \"John\", lastName: \"Doe\"\"}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Updated successfully."
+          },
+          "401" : {
+            "description" : "Missing or invalid authorization token."
+          },
+          "403" : {
+            "description" : "If an user tries to update another user's entity."
+          },
+          "404" : {
+            "description" : "The entity is not found."
+          },
+          "422" : {
+            "description" : "If the JSON body does not contain the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/tokens" : {
+      "post" : {
+        "summary" : "Generate token",
+        "description" : "Currently, token generation is done based on user's email and password.\nIn future, we may integrate with OpenID based systems like Google or Facebook for authentication.\nNote, this POST method (essentially a *write operation*) does **not** require an Authorization request header.",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Accept",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n  email: \"johndoe@stackoverflow.com\",\n  password: \"secret\"\n}"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Authentication successful.",
+            "schema" : {
+              "$ref" : "#/definitions/User"
+            },
+            "headers" : {
+              "Authorization" : {
+                "type" : "string",
+                "description" : "The generated JWT token",
+                "x-example" : "Authorization: 832saf876wq3rgqwe876324gware32sad"
+              }
+            }
+          },
+          "401" : {
+            "description" : "If username / password is incorrect."
+          }
+        }
+      }
+    },
+    "/questions" : {
+      "get" : {
+        "summary" : "Search questions",
+        "description" : "Search question collection by question text. The result is paginated. It will return only the first level JSON object. Comments and answers will not be returned.",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "text",
+          "in" : "query",
+          "required" : true,
+          "type" : "string",
+          "description" : "Question text to be searched, passed in URL encoded form.",
+          "x-example" : "text=vertx%20%scaling"
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "required" : false,
+          "type" : "integer",
+          "description" : "The page number to return. This API is paginated. If left empty, defaults to 1",
+          "x-example" : "page=1"
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "required" : false,
+          "type" : "integer",
+          "description" : "The number of result instances to return. If left empty, defaults to 10",
+          "x-example" : "size=10"
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "description" : "List of matching questions along with answers and comments.",
+              "items" : {
+                "$ref" : "#/definitions/Question"
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Post a question",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Question"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Question posted successfully.",
+            "headers" : {
+              "Location" : {
+                "type" : "string",
+                "description" : "ID of the question.",
+                "x-example" : "4455-2212-3345-7765"
+              }
+            }
+          },
+          "401" : {
+            "description" : "If user is not authenticated, due to missing or incorrect Authorization header."
+          },
+          "422" : {
+            "description" : "The POST body did not contain all the required attributes."
+          }
+        }
+      }
+    },
+    "/questions/{id}" : {
+      "get" : {
+        "summary" : "Get question by ID",
+        "description" : "Get the Question document along with all comments, answers and comments for answers.",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/Question"
+            }
+          },
+          "404" : {
+            "description" : "The entity is not found."
+          }
+        }
+      },
+      "patch" : {
+        "summary" : "Update question",
+        "description" : "Update a question entity:\n1. Update content.\n2. Vote Up.\n3. Vote Down.",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "required" : false,
+          "type" : "string",
+          "description" : "The type of update done.\n1. For vote up: ?action=VOTE_UP\n2. For vote down: ?action=VOTE_DOWN\n3. For content update: ?action=CONTENT_UPDATE"
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Question"
+          },
+          "x-examples" : {
+            "application/json" : "{text: \"The updated text to be provided for this question.\"}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Updated successfully."
+          },
+          "401" : {
+            "description" : "Missing or invalid authorization token."
+          },
+          "403" : {
+            "description" : "If the owner of the question tries to vote the question."
+          },
+          "404" : {
+            "description" : "The entity is not found."
+          },
+          "422" : {
+            "description" : "If the JSON body does not contain the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/questions/{id}/comments" : {
+      "post" : {
+        "summary" : "Post comment for a question",
+        "description" : "Post a comment for a question.",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Comment"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Comment posted successfully.",
+            "headers" : {
+              "Location" : {
+                "type" : "string",
+                "description" : "ID of the comment.",
+                "x-example" : "4455-2212-3345-7765"
+              }
+            }
+          },
+          "401" : {
+            "description" : "If user is not authenticated, due to missing or incorrect Authorization header."
+          },
+          "422" : {
+            "description" : "The POST body did not contain all the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/questions/{id}/comments/{id}" : {
+      "patch" : {
+        "summary" : "Update comment for question",
+        "description" : "Update a comment for a question:\n1. Update the content\n2. Vote up\n3. Vote down",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "required" : false,
+          "type" : "string",
+          "description" : "1. For vote up: ?action=VOTE_UP\n2. For vote down: ?action=VOTE_DOWN\n3. For content update: ?action=CONTENT_UPDATE"
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "Owner of comment updates the content: {text: \"the updated answer.\"}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200"
+          },
+          "401" : {
+            "description" : "Missing or invalid authorization token."
+          },
+          "403" : {
+            "description" : "If an user other than the owner of the comment tries to update the content."
+          },
+          "404" : {
+            "description" : "Entity not found."
+          },
+          "422" : {
+            "description" : "If the JSON body does not contain the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/questions/{id}/answers" : {
+      "post" : {
+        "summary" : "Post an answer",
+        "description" : "Post an answer for the given question.",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Answer"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Answer posted successfully.",
+            "headers" : {
+              "Location" : {
+                "type" : "string",
+                "description" : "ID of the answer object.",
+                "x-example" : "4455-2212-3345-7765"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Missing or invalid authorization token."
+          },
+          "422" : {
+            "description" : "The POST body did not contain all the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/questions/{id}/answers/{id}" : {
+      "patch" : {
+        "summary" : "Update answer",
+        "description" : "Scenarios:\n1. Update content\n2. Vote up\n3. Vote down\n4. Owner of *question* wants to set this answer as the best one.",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "required" : false,
+          "type" : "string",
+          "description" : "1. For vote up: ?action=VOTE_UP\n2. For vote down: ?action=VOTE_DOWN\n3. For content update: ?action=CONTENT_UPDATE\n4. To set best answer: ?action=SET_ANSWER"
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Answer"
+          },
+          "x-examples" : {
+            "application/json" : "Owner of answer updates the content: {text: \"the updated answer.\"}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200"
+          },
+          "401" : {
+            "description" : "Missing or invalid authorization token."
+          },
+          "403" : {
+            "description" : "1. If an user other than the owner of the question tries to mark this as the best answer.\n2. If an user other than the owner of the answer tries to update the content."
+          },
+          "404" : {
+            "description" : "Entity not found."
+          },
+          "422" : {
+            "description" : "If the JSON body does not contain the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/questions/{id}/answers/{id}/comments" : {
+      "post" : {
+        "summary" : "Post comment for an answer",
+        "description" : "Post a comment for an answer.",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Comment"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Comment posted successfully.",
+            "headers" : {
+              "Location" : {
+                "type" : "string",
+                "description" : "ID of the comment object",
+                "x-example" : "4455-2212-3345-7765"
+              }
+            }
+          },
+          "401" : {
+            "description" : "If user is not authenticated, due to missing or incorrect Authorization header."
+          },
+          "422" : {
+            "description" : "The POST body did not contain all the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/questions/{id}/answers/{id}/comments/{id}" : {
+      "patch" : {
+        "summary" : "Update comment for an answer",
+        "description" : "Update a comment for an answer:\n1. Update the content\n2. Vote up\n3. Vote down",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "required" : false,
+          "type" : "string",
+          "description" : "1. For vote up: ?action=VOTE_UP\n2. For vote down: ?action=VOTE_DOWN\n3. For content update: ?action=CONTENT_UPDATE"
+        }, {
+          "name" : "Content-Type",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "description" : "application/json"
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Bearer asdf2364saf8796324xcihkj23h42oi34"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "Owner of comment updates the content: {text: \"the updated answer.\"}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200"
+          },
+          "401" : {
+            "description" : "Missing or invalid authorization token."
+          },
+          "403" : {
+            "description" : "If an user other than the owner of the comment tries to update the content."
+          },
+          "404" : {
+            "description" : "Entity not found."
+          },
+          "422" : {
+            "description" : "If the JSON body does not contain the required attributes."
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    }
+  },
+  "definitions" : {
+    "User" : {
+      "type" : "object",
+      "required" : [ "firstName", "lastName" ],
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "description" : "Email address used as identifier as well as username for login."
+        },
+        "firstName" : {
+          "type" : "string",
+          "description" : "First name"
+        },
+        "lastName" : {
+          "type" : "string",
+          "description" : "Last name"
+        },
+        "createdTime" : {
+          "type" : "number",
+          "description" : "Created time"
+        },
+        "password" : {
+          "type" : "string",
+          "description" : "Password for the user."
+        },
+        "lastUpdatedTime" : {
+          "type" : "string",
+          "description" : "Last updated time"
+        }
+      },
+      "description" : "*Sample JSON Structure:*\n```\n\t{\n\t\t_id: \"john.doe@stackoverflow.com\", // Email address will be the ID.\n\t\tfirstName: \"John\",\n\t\tlastName: \"Doe\",\n\t\tpassword: \"<one-way-hashed-value>\",\n\t\tcreatedTime: 1493720595286,\n\t\tlastUpdatedTime: 1493720595286\n\t}\n```"
+    },
+    "Question" : {
+      "type" : "object",
+      "required" : [ "text" ],
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "description" : "Identifier"
+        },
+        "userId" : {
+          "type" : "string",
+          "description" : "The identifier of the user who posted this question."
+        },
+        "userName" : {
+          "type" : "string",
+          "description" : "The display name of the user who posted this question."
+        },
+        "lastUpdatedUserId" : {
+          "type" : "string",
+          "description" : "Identifier of the user who last updated this question."
+        },
+        "lastUpdatedUserName" : {
+          "type" : "string",
+          "description" : "Display name of the user who last updated this question."
+        },
+        "text" : {
+          "type" : "string",
+          "description" : "The answer content."
+        },
+        "tags" : {
+          "type" : "array",
+          "description" : "Any tags relevant to the answer",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "voteCount" : {
+          "type" : "integer",
+          "description" : "Count of votes for this question."
+        },
+        "createdTime" : {
+          "type" : "number"
+        },
+        "lastUpdatedTime" : {
+          "type" : "number"
+        },
+        "viewCount" : {
+          "type" : "integer",
+          "description" : "View count for this question. Only gets incremented if a questions is retrieved by ID."
+        },
+        "comments" : {
+          "type" : "array",
+          "description" : "List of comments for this question.",
+          "items" : {
+            "$ref" : "#/definitions/Comment"
+          }
+        },
+        "answers" : {
+          "type" : "array",
+          "description" : "List of answers for this question.",
+          "items" : {
+            "$ref" : "#/definitions/Answer"
+          }
+        }
+      },
+      "description" : "*Sample JSON Structure:*\n1. When posted:\n```\n\t{\n\t\ttext: \"This is the content of a sample answer\",\n\t\ttags: [\"sample\"],\n\t}\n```\n2. When retrieved:\n```\n\t{\n\t\t_id: \"1234-5678-9012-3456\",\n\t\tuserId: \"billswift@stackoverflow.com\",\n\t\tuserName: \"Bill Swift\",\n\t\tlastUpdatedUserId: \"johndoe@stackoverflow.com\",\n\t\tlastUpdatedUserName: \"John Doe\",\n\t\ttext: \"This is the content of a sample question\",\n\t\ttags: [\"sample\"],\n\t\tvoteCount: 654,\n\t\tcreatedTime: 1493719334210,\n\t\tlastUpdatedTime: 1493719362860,\n\t\tviewCount: 4532,\n\t\tcomments: [{\n\t\t\t_id: \"1234-5678-9012-3456\",\n\t\t\tuserId: \"jenniferstorm@stackoverflow.com\",\n\t\t\tuserDisplayName: \"Jennifer Storm\",\n\t\t\ttext: \"This is the content of a sample comment\",\n\t\t\ttags: [\"sample\"],\n\t\t\tvoteCount: 23,\n\t\t\tcreatedTime: 1493719334210,\n\t\t\tlastUpdatedTime: 1493719362860\n\t\t}],\n\t\tanswers: [{\n\t\t\t_id: \"1234-5678-9012-3456\",\n\t\t\tuserId: \"anneblack@stackoverflow.com\",\n\t\t\tuserDisplayName: \"Anne Black\",\n\t\t\ttext: \"This is the content of a sample answer\",\n\t\t\ttags: [\"sample\"],\n\t\t\tvoteCount: 45,\n\t\t\tcreatedTime: 1493719334210,\n\t\t\tlastUpdatedTime: 1493719362860,\n\t\t\tisSelectedAnswer: false,\n\t\t\tcomments: [{\n\t\t\t\t_id: \"1234-5678-9012-3456\",\n\t\t\t\tuserId: \"johndoe@stackoverflow.com\",\n\t\t\t\tuserDisplayName: \"John Doe\",\n\t\t\t\ttext: \"This is the content of a sample comment\",\n\t\t\t\ttags: [\"sample\"],\n\t\t\t\tvoteCount: 23,\n\t\t\t\tcreatedTime: 1493719334210,\n\t\t\t\tlastUpdatedTime: 1493719362860\n\t\t\t}]\n\t\t}]\n\t}\n```"
+    },
+    "Answer" : {
+      "type" : "object",
+      "required" : [ "text" ],
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "description" : "Identifier"
+        },
+        "userId" : {
+          "type" : "string",
+          "description" : "The identifier of the user who entered this answer."
+        },
+        "userName" : {
+          "type" : "string",
+          "description" : "The display name of the user."
+        },
+        "text" : {
+          "type" : "string",
+          "description" : "The answer content."
+        },
+        "tags" : {
+          "type" : "array",
+          "description" : "Any tags relevant to the answer",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "voteCount" : {
+          "type" : "integer"
+        },
+        "createdTime" : {
+          "type" : "number"
+        },
+        "lastUpdatedTime" : {
+          "type" : "number"
+        },
+        "isSelectedAnswer" : {
+          "type" : "boolean",
+          "description" : "Is this the selected answer?"
+        },
+        "comments" : {
+          "type" : "array",
+          "description" : "List of comments for this answer.",
+          "items" : {
+            "$ref" : "#/definitions/Comment"
+          }
+        }
+      },
+      "description" : "*Sample JSON Structure:*\n\n1. When posted:\n```\n\t{\n\t\ttext: \"This is the content of a sample answer\",\n\t\ttags: [\"sample\"]\n\t}\n```\n2. When retrieved:\n```\n\t{\n\t\t_id: \"1234-5678-9012-3456\",\n\t\tuserId: \"smithblack@stackoverflow.com\",\n\t\tuserName: \"Smith Black\",\n\t\ttext: \"This is the content of a sample answer\",\n\t\ttags: [\"sample\"],\n\t\tvoteCount: 45,\n\t\tcreatedTime: 1493719334210,\n\t\tlastUpdatedTime: 1493719362860,\n\t\tisSelectedAnswer: false,\n\t\tcomments: [{\n\t\t\t_id: \"1234-5678-9012-3456\",\n\t\t\tuserId: \"6754-0987-6754-3289\",\n\t\t\tuserDisplayName: \"John Doe\",\n\t\t\ttext: \"This is the content of a sample comment\",\n\t\t\ttags: [\"sample\"],\n\t\t\tvoteCount: 23,\n\t\t\tcreatedTime: 1493719334210,\n\t\t\tlastUpdatedTime: 1493719362860\n\t\t}]\n\t}\n```"
+    },
+    "Comment" : {
+      "type" : "object",
+      "required" : [ "text" ],
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "description" : "Identifier"
+        },
+        "userId" : {
+          "type" : "string",
+          "description" : "The identifier of the user who entered this comment."
+        },
+        "userName" : {
+          "type" : "string",
+          "description" : "The display name of the user."
+        },
+        "text" : {
+          "type" : "string",
+          "description" : "The comment content."
+        },
+        "tags" : {
+          "type" : "array",
+          "description" : "Any tags relevant to the comment",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "voteCount" : {
+          "type" : "integer"
+        },
+        "createdTime" : {
+          "type" : "number"
+        },
+        "lastUpdatedTime" : {
+          "type" : "number"
+        }
+      },
+      "description" : "*Sample JSON Structure:*\n1. When posted:\n```\n\t{\n\t\ttext: \"This is the content of a sample comment\",\n\t\ttags: [\"sample\"]\n\t}\n```\n\n2. When retrieved:\n```\n\t{\n\t\t_id: \"1234-5678-9012-3456\",\n\t\tuserId: \"johndoe@stackoverflow.com\",\n\t\tuserName: \"John Doe\",\n\t\ttext: \"This is the content of a sample comment\",\n\t\ttags: [\"sample\"],\n\t\tvoteCount: 23,\n\t\tcreatedTime: 1493719334210,\n\t\tlastUpdatedTime: 1493719362860\n\t}\n```"
+    }
+  }
+}

@@ -11,20 +11,19 @@ var TokenValidatorHandler = {
         if (typeof authHeader !== "undefined" && authHeader != null && authHeader.startsWith("Bearer ")) {
             var jwtToken = authHeader.split("Bearer ")[1];
             // TODO : Validate token.
-            this.pass(rc);
+
+            // TODO : Set user info from token into context.
+
+            rc.next();
         } else {
-            this.fail(rc);
+            TokenValidatorHandler.fail(rc);
         }
     },
     fail : function(rc) {
-        // TODO: Log failed request.
+        logger.warn("Token validation failed. Request: " + rc.request().method() + " " + rc.request().uri());
 
         // Return HTTP 401 status.
         rc.response().setStatusCode(401).setStatusMessage(
                 "Authentication failed. Missing or invalid Authorization token.").end();
-    },
-    pass : function(rc) {
-        // Pass on to next handler.
-        rc.next();
     }
 }

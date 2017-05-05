@@ -42,5 +42,5 @@ var RestApiRouter = {
         this.router.patch("/questions/:questionId/answers/:answerId/comments/:commentId").handler(CommentsHandler.updateCommentOnAnswer);
 
         return this;
-    },
+    }
 }
